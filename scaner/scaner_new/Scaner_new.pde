@@ -6,10 +6,11 @@ Serial myPort; // defines Object Serial
 // defubes variables
 String angle="";
 String distance="";
+String distance2="";
 String data="";
 String noObject;
-float pixsDistance;
-int iAngle, iDistance;
+float pixsDistance, pixsDistance2;
+int iAngle, iDistance, iDistance2;
 int index1=0;
 int index2=0;
 PFont orcFont;
@@ -18,7 +19,7 @@ void setup()
 {  
  size (1000, 1000); // ***CHANGE THIS TO YOUR SCREEN RESOLUTION***
  smooth();
- myPort = new Serial(this,"COM15", 9600); // starts the serial communication
+ myPort = new Serial(this, "/dev/tty.usbmodem143101", 9600); // starts the serial communication
  myPort.bufferUntil('.'); // reads the data from the serial port up to the character '.'. So actually it reads this: angle,distance.
 }
 
@@ -46,12 +47,19 @@ void serialEvent (Serial myPort)
   data = data.substring(0,data.length()-1);
   
   index1 = data.indexOf(","); // find the character ',' and puts it into the variable "index1"
+  index2 = data.indexOf(",", index1+1);
   angle= data.substring(0, index1); // read the data from position "0" to position of the variable index1 or thats the value of the angle the Arduino Board sent into the Serial Port
-  distance= data.substring(index1+1, data.length()); // read the data from position "index1" to the end of the data pr thats the value of the distance
+  distance= data.substring(index1+1, index2); // read the data from position "index1" to the end of the data pr thats the value of the distance
+  distance2= data.substring(index2+1, data.length()); // read the data from position "index1" to the end of the data pr thats the value of the distance
+  
+  
   
   // converts the String variables into Integer
   iAngle = int(angle);
   iDistance = int(distance);
+  iDistance2 = int(distance2);
+  
+  println(iAngle + ":" + iDistance + ":" + iDistance2);
 }
 
 void drawRadar()
@@ -90,19 +98,21 @@ void drawObject()
   strokeWeight(6);
   stroke(255,10,10); // red color
   pixsDistance = iDistance*((height-height*0.25)*0.025); // covers the distance from the sensor from cm to pixels
+  pixsDistance2 = iDistance2*((height-height*0.25)*0.025); // covers the distance from the sensor from cm to pixels
   // limiting the range to 40 cms
   
   if(iDistance<80)
   {
-    fill(255,10,10);
-    noStroke();
-    ellipse(pixsDistance, pixsDistance, 10, 10);
+    // draws the object according to the angle and the distance
+  line(pixsDistance*cos(radians(iAngle)),-pixsDistance*sin(radians(iAngle)),(width-width*0.505)*cos(radians(iAngle)),-(width-width*0.505)*sin(radians(iAngle)));
   }
-  //if(iDistance<80)
-  //{
-  //  // draws the object according to the angle and the distance
-  //line(pixsDistance*cos(radians(iAngle)),-pixsDistance*sin(radians(iAngle)),(width-width*0.505)*cos(radians(iAngle)),-(width-width*0.505)*sin(radians(iAngle)));
-  //}
+  
+    if(iDistance2<80)
+  {
+    // draws the object according to the angle and the distance
+  line(-pixsDistance2 * cos(radians(iAngle)), pixsDistance2 * sin(radians(iAngle)), -(width - width * 0.505) * cos(radians(iAngle)), (width - width * 0.505) * sin(radians(iAngle)));
+  }
+  
   popMatrix();
 }
 void drawLine()
@@ -112,6 +122,7 @@ void drawLine()
   stroke(30,250,60);
   translate(width/2,height/2); // moves the starting coordinats to new location
   line(0,0,(height-height*0.12)*cos(radians(iAngle)),-(height-height*0.12)*sin(radians(iAngle))); // draws the line according to the angle
+  line(0,0,(height-height*0.12)*cos(radians(iAngle-180)),-(height-height*0.12)*sin(radians(iAngle-180))); // draws the line according to the angle
   popMatrix();
 }
 

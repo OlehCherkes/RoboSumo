@@ -19,7 +19,7 @@ void setup()
 {  
  size (1000, 1000); // ***CHANGE THIS TO YOUR SCREEN RESOLUTION***
  smooth();
- myPort = new Serial(this, "/dev/tty.usbmodem143101", 9600); // starts the serial communication
+ myPort = new Serial(this, "COM15", 9600); // starts the serial communication  "/dev/tty.usbmodem143101"
  myPort.bufferUntil('.'); // reads the data from the serial port up to the character '.'. So actually it reads this: angle,distance.
 }
 

@@ -47,7 +47,7 @@ void loop()
 
 void servoScan()
 {
-  if (millis() - tmr >= 100) {
+  if (millis() - tmr >= 20) {
     tmr = millis();
     val += dir;                             // прибавляем скорость
     if (val >= 180 || val <= 0) dir = -dir;  // разворачиваем

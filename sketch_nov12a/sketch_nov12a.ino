@@ -28,9 +28,9 @@
 #define RIGHT_HC_TRIG 25
 #define RIGHT_HC_ECHO 5
 
-NewPing sonarFront(FRONT_HC_TRIG, FRONT_HC_ECHO, 100);
-NewPing sonarLeft(LEFT_HC_TRIG, LEFT_HC_ECHO, 100);
-NewPing sonarRight(RIGHT_HC_TRIG, RIGHT_HC_ECHO, 100);
+NewPing sonarFront(FRONT_HC_TRIG, FRONT_HC_ECHO, 150);
+NewPing sonarLeft(LEFT_HC_TRIG, LEFT_HC_ECHO, 150);
+NewPing sonarRight(RIGHT_HC_TRIG, RIGHT_HC_ECHO, 150);
 
 // IR Sensor
 #define IR_SENSOR_1 15
@@ -53,13 +53,13 @@ button btn(BUTTON);
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire);
 
 //------------------------------------------------------------//
-int tornTime = 200; //170;
+int tornTime = 200; // ms
 int rotateTime = (tornTime * 2); //(tornTime  - 30);
 int startFightDelay = 400;
-int straightDelay = 300;
+int straightDelay = 200;
 
-int sonarDistance = 50; //30;
-int IRDistance = 80;  // 40;
+int sonarDistance = 100; // sm
+int IRDistance = 80;  // sm
 unsigned long lastMeasurementTime = 0;
 const unsigned long measurementInterval = 100;
 
@@ -255,18 +255,21 @@ Position sonar()
   {
     lastMeasurementTime = currentTime;
 
-    if (sonarFront.ping_cm() != 0 && sonarFront.ping_cm() < sonarDistance)
+    unsigned long frontDistance = sonarFront.ping_cm();
+    unsigned long leftDistance = sonarLeft.ping_cm();
+    unsigned long rightDistance = sonarRight.ping_cm();
+
+    if (frontDistance != 0 && frontDistance < sonarDistance)
       return STRAIGHT;
 
-    if (sonarLeft.ping_cm() != 0 && sonarLeft.ping_cm() < sonarDistance)
+    if (leftDistance != 0 && leftDistance < sonarDistance)
       return LEFT;
 
-    if (sonarRight.ping_cm() != 0 && sonarRight.ping_cm() < sonarDistance)
+    if (rightDistance != 0 && rightDistance < sonarDistance)
       return RIGHT;
-
-    return NONE;
   }  
 
+  return NONE;
 }
 
 Position IRSensor()

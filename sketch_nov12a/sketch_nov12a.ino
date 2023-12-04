@@ -53,8 +53,11 @@ button btn(BUTTON);
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire);
 
 //------------------------------------------------------------//
-int tornTime = 170;
-int rotateTime = ((rotateTime * 2) - 40);
+int tornTime = 200; //170;
+int rotateTime = (tornTime * 2); //(tornTime  - 30);
+int startFightDelay = 400;
+int straightDelay = 300;
+
 int sonarDistance = 50; //30;
 int IRDistance = 80;  // 40;
 unsigned long lastMeasurementTime = 0;
@@ -93,6 +96,10 @@ void setup()
   pinMode(LINE_SENSOR_LEFT, INPUT);
   pinMode(LINE_SENSOR_RIGHT, INPUT);
   pinMode(LINE_SENSOR_BACK, INPUT);
+
+  // attachInterrupt(digitalPinToInterrupt(LINE_SENSOR_LEFT), robotLine, FALLING);
+  // attachInterrupt(digitalPinToInterrupt(LINE_SENSOR_RIGHT), robotLine, FALLING);
+  // attachInterrupt(digitalPinToInterrupt(LINE_SENSOR_BACK), robotLine, FALLING);
 
   pinMode(IR_SENSOR_1, INPUT);
   pinMode(IR_SENSOR_2, INPUT);
@@ -136,6 +143,8 @@ void posStraight()
 
   digitalWrite(MOTOR_R1, LOW);
   digitalWrite(MOTOR_R2, HIGH);
+
+  delay(straightDelay);
 }
 
 // robot back
@@ -148,6 +157,8 @@ void posBack()
 
   digitalWrite(MOTOR_R1, HIGH);
   digitalWrite(MOTOR_R2, LOW);
+
+  delay(500);
 }
 
 // robot left
@@ -160,6 +171,8 @@ void posLeft()
 
   digitalWrite(MOTOR_R1, LOW);
   digitalWrite(MOTOR_R2, HIGH);
+
+  delay(tornTime);
 }
 
 // robot right
@@ -172,6 +185,8 @@ void posRight()
 
   digitalWrite(MOTOR_R1, HIGH);
   digitalWrite(MOTOR_R2, LOW);
+
+  delay(tornTime);
 }
 
 // robot stop
@@ -198,6 +213,9 @@ Position lineSensor()
   if (digitalRead(LINE_SENSOR_BACK) == LOW)
     return BACK;
 
+  if (digitalRead(LINE_SENSOR_LEFT) == LOW && digitalRead(LINE_SENSOR_RIGHT) == LOW)
+     return ROTATE;
+
   return NONE;
 }
 
@@ -207,6 +225,10 @@ void robotLine()
 
   switch (motor)
   {
+    case ROTATE:
+      posBack();
+      break;
+
     case BACK:
       posStraight();
       break;
@@ -218,7 +240,7 @@ void robotLine()
     case RIGHT:
       posLeft();
       break;
-    
+   
     case NONE:
       posStop();
       break;
@@ -244,6 +266,7 @@ Position sonar()
 
     return NONE;
   }  
+
 }
 
 Position IRSensor()
@@ -269,11 +292,11 @@ Position IRSensor()
 
 void robotPosition()
 {
-  roboSumo = sonar();
+  roboSumo = IRSensor();//
 
   if (roboSumo == NONE)
   {
-    roboSumo = IRSensor();
+    roboSumo = sonar();
   }
 
   switch(roboSumo)
@@ -284,17 +307,18 @@ void robotPosition()
 
     case LEFT:
       posRight();
-      delay(tornTime);
+      posStraight(); // ??
       break;
 
     case RIGHT:
       posLeft();
-      delay(tornTime);
+      posStraight(); // ??
       break;
 
     case ROTATE:
       posLeft();
       delay(rotateTime);
+      posStraight(); //
       break;
 
     case NONE:
@@ -328,28 +352,22 @@ void startFight(Mode &robo)
   {
     case FIGHT_STRAIGHT:
       posStraight();
-      delay(300);
       break;
     
     case FIGHT_LEFT:
       posRight();
-      delay(tornTime);
       posStraight();
-      delay(300);
       break;
 
     case FIGHT_RIGHT:
       posLeft();
-      delay(tornTime);
       posStraight();
-      delay(300);
       break;
 
     case FIGHT_BACK:
       posLeft();
       delay(rotateTime);
       posStraight();
-      delay(300);
       break;
   }
 }
@@ -442,7 +460,7 @@ void displayMode(Mode &robo)
   }
 
   display.display();
-  delay(2000);
+  delay(1000);
 }
 
 

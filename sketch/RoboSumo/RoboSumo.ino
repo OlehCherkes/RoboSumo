@@ -62,7 +62,6 @@ void servoScan()
     if (currentDistance != lastDistance )
     {
         lastDistance = currentDistance;
-
     }
 
     if (currentDistance2 != lastDistance2)

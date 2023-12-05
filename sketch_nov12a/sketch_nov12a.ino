@@ -54,7 +54,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire);
 
 //------------------------------------------------------------//
 int tornTime = 200; // ms
-int rotateTime = (tornTime * 2); //(tornTime  - 30);
+int rotateTime = (tornTime  - 30);
 int startFightDelay = 400;
 int straightDelay = 200;
 
@@ -283,10 +283,10 @@ Position IRSensor()
     int ir1_distance_cm = 29.988 * pow(analogRead(IR_SENSOR_1) * (3.3 / 4096), -1.173);
     int ir2_distance_cm = 29.988 * pow(analogRead(IR_SENSOR_2) * (3.3 / 4096), -1.173);
 
-    if (ir1_distance_cm <= IRDistance && (ir1_distance_cm < 20 || ir1_distance_cm > 30))
+    if (ir1_distance_cm <= IRDistance && (ir1_distance_cm < 17 || ir1_distance_cm > 30))
       return STRAIGHT;
 
-    if (ir2_distance_cm <= IRDistance && (ir2_distance_cm < 20 || ir2_distance_cm > 30))
+    if (ir2_distance_cm <= IRDistance && (ir2_distance_cm < 17 || ir2_distance_cm > 30))
       return ROTATE;
 
     return NONE;
